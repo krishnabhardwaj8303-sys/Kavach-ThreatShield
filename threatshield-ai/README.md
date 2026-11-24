@@ -61,7 +61,18 @@ Architecture diagram: `docs/` and the technical report.
 | Network | IsolationForest (unsupervised) | False-positive rate 0.30 |
 | SMS | ComplementNB | Macro-F1 0.52 and scam-vs-legit false-positive rate 0.43 on templates unseen in training. **Weak.** |
 
-Precision and F1 for the URL and network engines: [see `evaluation/` result files and fill in].
+Detailed test-set metrics (all synthetic, from `evaluation/results/*.json`):
+
+| Engine | Task | Precision | Recall | F1 | False-positive rate |
+|---|---|---|---|---|---|
+| URL | phishing vs benign (threshold 0.98) | 1.000 | 0.992 | 0.996 | 0.000 |
+| Network | RandomForest, normal vs suspicious | 0.984 | 0.994 | 0.989 | 0.007 |
+| Network | IsolationForest, normal vs suspicious | 0.587 | 1.000 | 0.739 | 0.303 |
+| SMS | scam vs legit | 0.954 | 1.000 | 0.976 | 0.425 |
+
+SMS 9-class result: accuracy 0.624, macro-F1 0.519. The `kyc`, `payment` and `phishing` classes got F1 0.0 (KYC messages were predicted as OTP, payment as delivery, phishing as banking). 54 of 127 legitimate test messages were flagged as scams. The scam-vs-legit accuracy (0.957) looks high only because scam messages are 1119 of the 1246 test messages.
+
+The URL split is by registered domain (1890 test URLs). The SMS test templates were unseen in training.
 
 ## 8. Installation & Execution
 
