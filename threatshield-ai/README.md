@@ -125,11 +125,13 @@ Competition: Arm Bharat AI-SoC Student Challenge 2026-27
 
 Problem Statement: PS-3 - On-device Threat, Phishing & Scam Detection
 
-Team Members: [Add names]
+Team Name: Varishtha
 
-College/Institution: [Add institution]
+Team Members: NAAM-1, NAAM-2
 
-Faculty Mentor: [Add name, if applicable]
+College/Institution: GGV (poora naam yahan likhiye)
+
+Faculty Mentor: Pragati Patharia
 
 ---
 
