@@ -1,109 +1,125 @@
-# ThreatShield AI
+﻿# ThreatShield AI: On-Device Threat, Phishing & Scam Detection
 
-**On-device threat, phishing & scam detection** — prototype for the *Bharat AI-SoC Challenge 2026–27*, Problem Statement 3 (PS3).
+Arm Bharat AI-SoC Student Challenge 2026-27
+Problem Statement 3: On-device Threat, Phishing & Scam Detection
 
-**Author:** Krishna Bhardwaj ([@krishnabhardwaj8303-sys](https://github.com/krishnabhardwaj8303-sys)) · Companion hardware project: *Kavach-ID lite* (Verilog, simulation/synthesis only)
+## 1. Project Overview
 
-> ## Honest status (read first)
-> | Area | Status |
-> |---|---|
-> | URL / SMS / network detectors, dashboard, tests | ✅ Working, reproducible |
-> | Training data | ⚠️ **Synthetic only** — metrics are *not* real-world accuracy |
-> | Llama-family model for explanations | ❌ **Not yet delivered** (template explainer used; optional Ollama backend never run) |
-> | ExecuTorch deployment | ❌ **Not yet verified** (export script written, never executed) |
-> | Arm device / emulator test | ❌ Not tested (all timings are x86_64) |
-> | Kavach-ID hardware interface | 🟡 Python driver verified against the Kavach UART bridge + register map **in simulation only**; nothing run on hardware |
->
-> Official PS3 lists **Llama + ExecuTorch** as required technologies; they are the main open gap. Details: [STATUS.md](STATUS.md).
+ThreatShield AI is a prototype that classifies URLs, SMS messages and network flows as safe or suspicious, and explains each verdict. All detectors run locally on CPU with no external server. An optional UART link reports verdicts to a hardware identity block (Kavach-ID lite) in simulation.
 
-## 1. Overview
-Offline-first pipeline: three independent detectors (URL, SMS, network flow) → independent explanation layer with an evidence validator → optional hardware link. No cloud calls in the inference path.
+## 2. Problem Statement
 
-![Architecture](docs/figures/architecture.png)
+Phishing messages, fraudulent links and digital scams are increasing. Server-based detection needs connectivity and sends user content off the device. This project explores local inference instead.
 
-## 2. Problem statement (PS3)
-Detect phishing URLs, scam SMS and network anomalies; explain threats to non-experts; recommend remediation; run locally on Arm-based hardware without cloud dependency.
+## 3. Key Features
 
-## 3. Features
-- URL scan (17 lexical features, calibrated probability, evidence list)
-- SMS scan (9 categories: banking, KYC, payment, delivery, OTP, prize, investment, phishing, legit)
-- Network-flow scan (RandomForest + IsolationForest, z-score evidence)
-- Risk levels (low/medium/high) with a "suspicious" band for uncertain scores
-- Explainer + **validator** (rejects any explanation that changes the detector's label or cites unsupported evidence)
-- Flask API + single-page dashboard, SQLite scan history, metrics page, hardware diagnostics (loopback model)
+- URL detector: lexical features, RandomForest with probability calibration.
+- SMS detector: TF-IDF with ComplementNB, 9 scam categories.
+- Network detector: RandomForest on flow features, plus an IsolationForest baseline.
+- Confidence-aware output: a detector can return "uncertain".
+- Validated explainer: template-based. A validator rejects any explanation that changes the label or cites evidence the detector did not produce.
+- Flask API and web dashboard.
+- Python driver for the Kavach UART bridge (6-byte frame: CMD, ADDR, 4 data bytes).
 
-## 4. Technology stack
-Python 3.12 · scikit-learn · NumPy/pandas/SciPy · Flask · SQLite · pytest · Icarus Verilog (interface simulation). Planned: Llama 3.2 1B via ExecuTorch (XNNPACK).
+## 4. System Architecture
 
-## 5. Repository layout
-```
-threatshield/        url_engine.py sms_engine.py net_engine.py pipeline.py app.py common.py
-  data/synth.py      synthetic data generators (seeded)
-  explain/engine.py  template + (optional) Ollama explainer, validator
-  hal/link.py        7-byte CRC-8 result frame + loopback/UART links (proposal)
-  hal/kavach.py      driver for Kavach-ID lite UART bridge (6-byte frame)
-frontend/index.html  dashboard
-models/              trained joblib models (version 0.1.0)
-evaluation/          bench.py, results/*.json, logs
-hardware/rtl/        proposed result-receiver Verilog + testbench (iverilog PASS)
-hardware/kavach_integration/   co-simulation against the Kavach bridge/register map (RTL NOT included)
-arm_deployment/      export_executorch.py (written, NOT yet run)
-tests/  docs/  train_all.py  requirements.txt  STATUS.md
-```
+1. Input: URL, SMS text or flow features.
+2. Detectors (URL, SMS, network): each returns label, calibrated probability and top features.
+3. Fusion: rule-based, confidence-aware policy.
+4. Explainer: deterministic templates, checked by a validator.
+5. Output: Flask API and dashboard. Optional hardware link (Python HAL, Kavach UART driver).
 
-## 6. Installation
+Architecture diagram: `docs/` and the technical report.
+
+## 5. Technology Stack
+
+- Language: Python 3.12
+- ML: scikit-learn, numpy, pandas, joblib
+- Models: RandomForest (URL, network), ComplementNB (SMS), IsolationForest (network baseline)
+- Backend/UI: Flask, single-page frontend
+- Hardware simulation: Verilog, iverilog
+- Dataset: **synthetic**, generated by `threatshield/data/synth.py` (seeded). No real-world dataset was used. See `DATASETS.md`.
+- Deployment platform: x86_64 desktop CPU only. [Add Arm board, if tested]
+
+## 6. Project Workflow
+
+1. User submits a URL, message or flow.
+2. Features are extracted.
+3. The matching detector predicts a label and calibrated probability.
+4. Fusion applies the confidence policy.
+5. The explainer produces a validated explanation.
+6. The dashboard or API shows the result.
+
+## 7. Model Performance
+
+**All numbers are on synthetic data. They measure fit to the generator, not real-world accuracy.**
+
+| Engine | Model | Metrics (synthetic test set) |
+|---|---|---|
+| URL | RandomForest, calibrated | Accuracy 0.997, Recall 0.992, False-positive rate 0 |
+| Network | RandomForest | Accuracy 0.993, False-positive rate 0.007 |
+| Network | IsolationForest (unsupervised) | False-positive rate 0.30 |
+| SMS | ComplementNB | Macro-F1 0.52 and scam-vs-legit false-positive rate 0.43 on templates unseen in training. **Weak.** |
+
+Precision and F1 for the URL and network engines: [see `evaluation/` result files and fill in].
+
+## 8. Installation & Execution
+
 ```bash
-git clone https://github.com/krishnabhardwaj8303-sys/ThreatShield-AI.git
-cd ThreatShield-AI
-python -m venv .venv && source .venv/bin/activate
+git clone https://github.com/krishnabhardwaj8303-sys/Kavach-ThreatShield.git
+cd Kavach-ThreatShield/threatshield-ai
 pip install -r requirements.txt
+python -m pytest tests
+python -m threatshield.app
 ```
 
-## 7. Run
-```bash
-python train_all.py            # optional: retrains and rewrites models/ + evaluation/results/
-python -m threatshield.app     # dashboard: http://127.0.0.1:8000
-python -m pytest -q tests      # 17 pass, 1 skipped without the Kavach RTL
-```
-Model files are `joblib` pickles: only load files you trust.
+Tests in the last verified run: 17 passed, 1 skipped (the skipped test needs `KAVACH_RTL_DIR`). The exact command to start the app is [verify against `threatshield/app.py`].
 
-## 8. Evaluation (synthetic data, held-out test split)
-| Model | Acc | Prec | Rec | FPR | FNR |
-|---|---|---|---|---|---|
-| URL RandomForest (calibrated) | 0.997 | 1.000 | 0.992 | 0.000 | 0.008 |
-| SMS scam-vs-legit (unseen templates) | 0.957 | 0.954 | 1.000 | 0.425 | 0.000 |
-| Network RandomForest | 0.993 | 0.984 | 0.994 | 0.007 | 0.006 |
-| Network IsolationForest | 0.788 | 0.587 | 1.000 | 0.303 | 0.000 |
+Optional Kavach co-simulation: set `KAVACH_RTL_DIR` to the repository root (where the `.v` files are) and see `docs/KAVACH_INTEGRATION.md`.
 
-SMS 9-class macro-F1 on unseen message templates: **0.519** (weak; reported as measured). Splits: URL by registered domain, SMS by template, flows stratified. All values come from `train_all.py`; raw files in `evaluation/results/`. Confusion matrices: `docs/figures/`.
-Desktop latency, x86_64 1 vCPU, median: URL 33 ms · SMS 1.3 ms · network 13 ms (`PYTHONPATH=. python evaluation/bench.py`). **Not Arm results.**
+## 9. Demonstration
 
-## 9. ARM / ExecuTorch / Llama
-| Item | Status |
-|---|---|
-| Desktop x86_64 benchmark | ✅ done |
-| ExecuTorch export of flow-classifier MLP (`arm_deployment/export_executorch.py`) | ⏳ pending, not executed |
-| Llama 3.2 1B via ExecuTorch for explanations | ⏳ pending |
-| Quantized vs unquantized size | ⏳ pending |
-| Arm device / emulator | ⏳ pending |
+Demo Video: [Insert public YouTube/Google Drive link]
 
-## 10. Hardware integration (Kavach-ID lite)
-- `hal/kavach.py` speaks the Kavach UART bridge's 6-byte frame: `[CMD][ADDR][DATA×4 MSB-first]`, CMD `0x01` write / `0x02` read (4-byte reply).
-- `hardware/kavach_integration/run_cosim.py` drives those frames into the real `uart_to_reg_bridge` + `kavach_register_map` under Icarus Verilog: **COSIM PASS** (`evaluation/results/kavach_bridge_cosim.log`). The Kavach RTL is **not** in this repo; set `KAVACH_RTL_DIR` to your local copy.
-- Caveats: a test model replaced the unsupplied `uart_tx.v`; the full top level was not simulated; no hardware was used. See [docs/KAVACH_INTEGRATION.md](docs/KAVACH_INTEGRATION.md).
-- `hardware/rtl/` contains a separate *proposed* result-receiver (CRC-8 frame), simulated with iverilog (PASS).
+Screenshots: [Add: interface, input processing, model prediction, final classification]
 
-## 11. Screenshots
-Pending — to be added under `docs/screenshots/`.
+## 10. Hardware Utilization & Optimization
 
-## 12. Demo video
-[Demo video link — pending]
+Measured on x86_64, 1 vCPU Intel Xeon, 3.9 GB RAM, no GPU (not an Arm device):
 
-## 13. Known limitations
-Synthetic data only · weak SMS generalisation · high IsolationForest false-positive rate · no Llama/ExecuTorch yet · no Arm testing · URL model not yet optimised for edge · Kavach integration is simulation-level.
+| Engine | Median latency | Model size |
+|---|---|---|
+| URL | 33 ms | 6.2 MB |
+| SMS | 1.3 ms | 0.7 MB |
+| Network | 13 ms | 2.9 MB |
 
-## 14. Roadmap
-Llama 3.2 1B on ExecuTorch (Pi 5 / Arm Android) · retrain on real public datasets with verified licences · int8 export of a distilled URL model · Hinglish SMS data · optional on-chip verdict register in Kavach (requires RTL owner approval).
+- Loading the models adds about 18 MB of memory.
+- Quantization: not implemented.
+- ExecuTorch: `arm_deployment/export_executorch.py` is written but has **never been run**.
+- Llama: **not implemented.** The explainer uses deterministic templates. An Ollama backend exists in the code but was never run.
+- Arm hardware / emulator: **not tested.**
+- Kavach-ID lite (`uart_to_reg_bridge.v`, `kavach_register_map.v`, `uart_rx.v`): the driver was verified in iverilog simulation only. Nothing has run on hardware. The Kavach encrypted channel is XOR, not AES, and the lite design is simulation and synthesis only.
 
-## 15. License and data
-License: **[to be chosen by the repository owner]** — add a `LICENSE` file before publishing. Data: all synthetic (`threatshield/data/synth.py`); no third-party dataset used. Technical report: [docs/ThreatShield_AI_Technical_Report.pdf](docs/ThreatShield_AI_Technical_Report.pdf).
+## 11. Future Scope
+
+- Export a Llama-family model through ExecuTorch and run it on an Arm device.
+- Train and evaluate on real phishing and SMS datasets, including Indian-context scams (KYC, UPI, delivery).
+- Quantize and benchmark on Arm hardware.
+- Store verdicts on-chip through a reviewed register block in Kavach-ID.
+- Add framing, CRC and timeouts to the UART bridge.
+
+## 12. Team & Acknowledgement
+
+Competition: Arm Bharat AI-SoC Student Challenge 2026-27
+
+Problem Statement: PS-3 - On-device Threat, Phishing & Scam Detection
+
+Team Members: [Add names]
+
+College/Institution: [Add institution]
+
+Faculty Mentor: [Add name, if applicable]
+
+---
+
+This project is developed for the Arm Bharat AI-SoC Student Challenge 2026-27.
