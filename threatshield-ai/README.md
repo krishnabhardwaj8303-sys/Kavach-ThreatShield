@@ -73,7 +73,7 @@ python -m pytest tests
 python -m threatshield.app
 ```
 
-Tests in the last verified run: 17 passed, 1 skipped (the skipped test needs `KAVACH_RTL_DIR`). The exact command to start the app is [verify against `threatshield/app.py`].
+Tests in the last verified run: 17 passed, 1 skipped (the skipped test needs `KAVACH_RTL_DIR`). The app serves the dashboard at http://127.0.0.1:8000.
 
 Optional Kavach co-simulation: set `KAVACH_RTL_DIR` to the repository root (where the `.v` files are) and see `docs/KAVACH_INTEGRATION.md`.
 
