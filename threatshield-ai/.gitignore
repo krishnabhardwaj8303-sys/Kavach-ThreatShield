@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+scan_history.db
+.env
+*.pem
+*.key

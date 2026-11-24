@@ -1,0 +1,76 @@
+{
+ "version": "0.1.0",
+ "selected": "random_forest",
+ "validation_f1": {
+  "logreg": 0.993421052631579,
+  "random_forest": 0.9983471074380166,
+  "hist_gb": 0.9983471074380166
+ },
+ "threshold": 0.98,
+ "importance": {
+  "n_keywords": 0.44530473497743495,
+  "n_hyphens": 0.11502447675072255,
+  "is_https": 0.06225369800438043,
+  "bad_tld": 0.0417397468900329,
+  "host_len": 0.03961244620780171,
+  "query_len": 0.019962467328644772,
+  "path_len": 0.012724675467639557,
+  "url_len": 0.0003316731432324582,
+  "n_dots": 0.0,
+  "digit_ratio": 0.0,
+  "has_ip": 0.0,
+  "has_at": 0.0,
+  "n_subdomains": 0.0,
+  "entropy": 0.0,
+  "brand_in_subdomain": 0.0,
+  "punycode": 0.0,
+  "brand_not_registered": 0.0
+ },
+ "benign_p95": [
+  64.0,
+  19.0,
+  3.0,
+  1.0,
+  0.0,
+  0.0,
+  0.0,
+  1.0,
+  2.0,
+  0.0,
+  3.584183719779189,
+  0.0,
+  1.0,
+  22.0,
+  27.0,
+  0.0,
+  0.0
+ ],
+ "seed": 7,
+ "sizes": {
+  "train": 9182,
+  "val": 928,
+  "test": 1890
+ },
+ "test": {
+  "threshold": 0.98,
+  "accuracy": 0.9973544973544973,
+  "precision": 1.0,
+  "recall": 0.9923780487804879,
+  "f1": 0.9961744452945678,
+  "fpr": 0.0,
+  "fnr": 0.007621951219512195,
+  "confusion_matrix": [
+   [
+    1234,
+    0
+   ],
+   [
+    5,
+    651
+   ]
+  ],
+  "n": 1890
+ },
+ "test_brier": 0.0003004103863900458,
+ "data_note": "SYNTHETIC data; split by registered domain; not real-world accuracy"
+}

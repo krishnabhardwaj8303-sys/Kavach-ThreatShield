@@ -1,0 +1,152 @@
+{
+ "version": "0.1.0",
+ "iso_threshold": 0.4811282988747229,
+ "classes": [
+  "normal",
+  "port_scan",
+  "flood",
+  "exfiltration"
+ ],
+ "features": [
+  "duration",
+  "pkts",
+  "bytes_out",
+  "bytes_in",
+  "uniq_ports",
+  "syn_ratio",
+  "pkt_rate",
+  "out_in_ratio"
+ ],
+ "seed": 5,
+ "normal_mean": [
+  1.7983222275018502,
+  4.0605003773151,
+  9.540778312332582,
+  10.35521310054936,
+  1.0672570112015698,
+  0.045738182099699584,
+  2.7199264083105197,
+  0.49142015475154194
+ ],
+ "normal_std": [
+  0.934257638590532,
+  0.973259959829093,
+  1.280747489356123,
+  1.2693310609972164,
+  0.2820403485084887,
+  0.04277700472770858,
+  1.3455915232202789,
+  0.4263579632154389
+ ],
+ "sizes": {
+  "train": 4800,
+  "val": 1600,
+  "test": 1600
+ },
+ "test_iforest_normal_vs_suspicious": {
+  "threshold": 0.4811282988747229,
+  "accuracy": 0.788125,
+  "precision": 0.5865853658536585,
+  "recall": 1.0,
+  "f1": 0.7394312067640277,
+  "fpr": 0.30294906166219837,
+  "fnr": 0.0,
+  "confusion_matrix": [
+   [
+    780,
+    339
+   ],
+   [
+    0,
+    481
+   ]
+  ],
+  "n": 1600
+ },
+ "test_rf_normal_vs_suspicious": {
+  "threshold": 0.5,
+  "accuracy": 0.993125,
+  "precision": 0.9835390946502057,
+  "recall": 0.9937629937629938,
+  "f1": 0.9886246122026887,
+  "fpr": 0.0071492403932082215,
+  "fnr": 0.006237006237006237,
+  "confusion_matrix": [
+   [
+    1111,
+    8
+   ],
+   [
+    3,
+    478
+   ]
+  ],
+  "n": 1600
+ },
+ "test_rf_report": {
+  "normal": {
+   "precision": 0.9973070017953322,
+   "recall": 0.9928507596067918,
+   "f1-score": 0.9950738916256158,
+   "support": 1119.0
+  },
+  "port_scan": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1-score": 1.0,
+   "support": 151.0
+  },
+  "flood": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1-score": 1.0,
+   "support": 168.0
+  },
+  "exfiltration": {
+   "precision": 0.9520958083832335,
+   "recall": 0.9814814814814815,
+   "f1-score": 0.9665653495440729,
+   "support": 162.0
+  },
+  "accuracy": 0.993125,
+  "macro avg": {
+   "precision": 0.9873507025446414,
+   "recall": 0.9935830602720683,
+   "f1-score": 0.9904098102924221,
+   "support": 1600.0
+  },
+  "weighted avg": {
+   "precision": 0.9932662849794128,
+   "recall": 0.993125,
+   "f1-score": 0.9931695445970025,
+   "support": 1600.0
+  }
+ },
+ "test_rf_confusion_matrix": [
+  [
+   1111,
+   0,
+   0,
+   8
+  ],
+  [
+   0,
+   151,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   168,
+   0
+  ],
+  [
+   3,
+   0,
+   0,
+   159
+  ]
+ ],
+ "data_note": "SYNTHETIC flows (generator in data/synth.py); not real traffic, not CIC-IDS/UNSW"
+}

@@ -1,0 +1,219 @@
+{
+ "version": "0.1.0",
+ "selected": "complement_nb",
+ "validation_macro_f1": {
+  "logreg_C1": 0.45975615409577675,
+  "logreg_C10": 0.45975615409577675,
+  "complement_nb": 0.5883606192884544
+ },
+ "scam_threshold": 0.5,
+ "classes": [
+  "banking",
+  "kyc",
+  "payment",
+  "delivery",
+  "otp",
+  "prize",
+  "investment",
+  "phishing",
+  "legit"
+ ],
+ "seed": 11,
+ "sizes": {
+  "train": 3843,
+  "val": 1211,
+  "test": 1246
+ },
+ "test_macro_f1": 0.5193238555444071,
+ "test_report": {
+  "banking": {
+   "precision": 0.5055350553505535,
+   "recall": 1.0,
+   "f1-score": 0.6715686274509803,
+   "support": 137.0
+  },
+  "kyc": {
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1-score": 0.0,
+   "support": 129.0
+  },
+  "payment": {
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1-score": 0.0,
+   "support": 151.0
+  },
+  "delivery": {
+   "precision": 0.4209039548022599,
+   "recall": 1.0,
+   "f1-score": 0.5924453280318092,
+   "support": 149.0
+  },
+  "otp": {
+   "precision": 0.5150375939849624,
+   "recall": 1.0,
+   "f1-score": 0.6799007444168734,
+   "support": 137.0
+  },
+  "prize": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1-score": 1.0,
+   "support": 145.0
+  },
+  "investment": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1-score": 1.0,
+   "support": 137.0
+  },
+  "phishing": {
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1-score": 0.0,
+   "support": 134.0
+  },
+  "legit": {
+   "precision": 1.0,
+   "recall": 0.5748031496062992,
+   "f1-score": 0.73,
+   "support": 127.0
+  },
+  "accuracy": 0.6243980738362761,
+  "macro avg": {
+   "precision": 0.4934974004597529,
+   "recall": 0.6194225721784776,
+   "f1-score": 0.5193238555444071,
+   "support": 1246.0
+  },
+  "weighted avg": {
+   "precision": 0.490797064385636,
+   "recall": 0.6243980738362761,
+   "f1-score": 0.5201730801144747,
+   "support": 1246.0
+  }
+ },
+ "test_confusion_matrix": [
+  [
+   137,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   129,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   151,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   149,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   137,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   145,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   137,
+   0,
+   0
+  ],
+  [
+   134,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   54,
+   0,
+   0,
+   0,
+   0,
+   73
+  ]
+ ],
+ "test_scam_vs_legit": {
+  "threshold": 0.5,
+  "accuracy": 0.956661316211878,
+  "precision": 0.9539641943734015,
+  "recall": 1.0,
+  "f1": 0.9764397905759162,
+  "fpr": 0.4251968503937008,
+  "fnr": 0.0,
+  "confusion_matrix": [
+   [
+    73,
+    54
+   ],
+   [
+    0,
+    1119
+   ]
+  ],
+  "n": 1246
+ },
+ "data_note": "SYNTHETIC template-generated SMS; test templates unseen in training; not real-world accuracy"
+}

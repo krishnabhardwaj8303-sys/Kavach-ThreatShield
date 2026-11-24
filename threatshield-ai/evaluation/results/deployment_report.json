@@ -1,0 +1,55 @@
+{
+ "environment": {
+  "arch": "x86_64",
+  "cpu_count": 1,
+  "python": "3.12.3",
+  "note": "DESKTOP x86_64 development test only; NOT an ARM device"
+ },
+ "detector_latency_only": {
+  "url": {
+   "p50_ms": 33.524230500006524,
+   "p95_ms": 50.66171949997624,
+   "n": 210
+  },
+  "sms": {
+   "p50_ms": 1.2800525000074003,
+   "p95_ms": 1.4602049500055612,
+   "n": 210
+  },
+  "network": {
+   "p50_ms": 12.971105000005423,
+   "p95_ms": 13.686857449991408,
+   "n": 210
+  }
+ },
+ "full_pipeline_latency": {
+  "url": {
+   "p50_ms": 32.71235599999045,
+   "p95_ms": 44.035542249986285,
+   "n": 210
+  },
+  "sms": {
+   "p50_ms": 1.3937585000007857,
+   "p95_ms": 1.7394521500051492,
+   "n": 210
+  },
+  "network": {
+   "p50_ms": 13.164397499991765,
+   "p95_ms": 17.12658885000729,
+   "n": 210
+  }
+ },
+ "memory_mb": {
+  "model_load_rss_delta": 18.0,
+  "process_rss_after": 180.1
+ },
+ "model_sizes_kb": {
+  "net_model.joblib": 2865.4,
+  "url_model.joblib": 6181.3,
+  "sms_model.joblib": 698.7
+ },
+ "executorch": {
+  "status": "NOT VERIFIED",
+  "reason": "pip install executorch stalled in dependency resolution (no progress after ~8 min); install killed. export_executorch.py is written but was never executed."
+ }
+}

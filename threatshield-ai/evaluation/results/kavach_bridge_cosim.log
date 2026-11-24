@@ -1,0 +1,12 @@
+uart_tx used: ThreatShield TEST MODEL (user's uart_tx.v not supplied)
+PASS  CHIP_ID                                       frame=02fc00000000 got=4B415641
+PASS  STATUS: bist_pass|replay|auth_denied_replay   frame=020400000000 got=00000025
+PASS  PROVENANCE: stages=3, seq_violation=1         frame=021c00000000 got=0000000D
+PASS  OFFLINE: budget=0x5A, sync_required=1         frame=022000000000 got=0000015A
+PASS  WRITE CHALLENGE                               frame=0108deadbeef got=NORESP
+PASS  unknown CMD -> frame dropped                  frame=071000000000 got=NORESP
+PASS  CHIP_ID after dropped frame (resync)          frame=02fc00000000 got=4B415641
+PASS  KEY_STATUS                                    frame=023000000000 got=00000000
+PASS  WRITE CHALLENGE final                         frame=010812345678 got=NORESP
+PASS  final challenge_o                             frame=             got=CHALLENGE_O=12345678
+COSIM PASS

@@ -1,0 +1,8 @@
+numpy
+pandas
+scikit-learn
+joblib
+flask
+psutil
+pytest
+# optional: pyserial (UART backend), torch+executorch (arm_deployment)

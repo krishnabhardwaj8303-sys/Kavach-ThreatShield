@@ -1,0 +1,51 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ThreatShield-AI</title><style>
+:root{--bg:#0b1220;--card:#131d33;--tx:#e6edf7;--mu:#8da2c0;--ac:#3ea6ff;--lo:#2ecc71;--me:#f5b041;--hi:#ff5c5c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px system-ui,sans-serif}
+header{padding:14px 18px;border-bottom:1px solid #22304d;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+nav{display:flex;gap:6px;padding:10px 18px;overflow-x:auto}nav button{background:var(--card);color:var(--tx);border:1px solid #22304d;border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+nav button.on{border-color:var(--ac);color:var(--ac)}main{padding:0 18px 30px;max-width:900px;margin:auto}
+.card{background:var(--card);border-radius:12px;padding:16px;margin-top:12px}textarea,input{width:100%;background:#0b1220;color:var(--tx);border:1px solid #22304d;border-radius:8px;padding:10px;font:inherit}
+.go{margin-top:10px;background:var(--ac);color:#04121f;border:0;border-radius:8px;padding:10px 18px;font-weight:600;cursor:pointer}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-weight:700;color:#04121f}.low{background:var(--lo)}.medium{background:var(--me)}.high{background:var(--hi)}
+.bar{height:8px;background:#0b1220;border-radius:4px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px;border-bottom:1px solid #22304d;text-align:left;word-break:break-all}.mu{color:var(--mu)}.hide{display:none}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px}.g input{padding:6px}</style></head><body>
+<header><b>🛡 ThreatShield-AI</b><span class="mu" id="hw">hardware: …</span></header>
+<nav id="nav"></nav><main>
+<section id="url"><div class="card"><input id="uin" placeholder="https://example.com/login"><button class="go" onclick="scan('url')">Scan URL</button></div></section>
+<section id="sms" class="hide"><div class="card"><textarea id="sin" rows="4" placeholder="Paste an SMS"></textarea><button class="go" onclick="scan('sms')">Scan SMS</button></div></section>
+<section id="net" class="hide"><div class="card"><div class="g" id="fl"></div><button class="go" onclick="scan('net')">Analyze flow</button>
+<button class="go" style="background:#22304d;color:#e6edf7" onclick="preset()">Load port-scan sample</button></div></section>
+<div id="out"></div>
+<section id="hist" class="hide"><div class="card"><table id="ht"></table></div></section>
+<section id="perf" class="hide"><div class="card" id="pf"></div></section>
+<section id="hwd" class="hide"><div class="card"><button class="go" onclick="diag()">Run interface diagnostic</button><pre id="dg" class="mu"></pre></div></section>
+</main><script>
+const T=[["url","URL"],["sms","SMS"],["net","Network"],["hist","History"],["perf","Model performance"],["hwd","Hardware"]];
+const $=i=>document.getElementById(i),F=["duration","pkts","bytes_out","bytes_in","uniq_ports","syn_ratio","pkt_rate","out_in_ratio"];
+$("nav").innerHTML=T.map(([k,n])=>`<button data-k="${k}">${n}</button>`).join("");
+$("fl").innerHTML=F.map(f=>`<label class="mu">${f}<input id="f_${f}" type="number" step="any" value="1"></label>`).join("");
+function show(k){T.forEach(([x])=>$(x).classList.toggle("hide",x!==k));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.k===k));
+ $("out").classList.toggle("hide",!["url","sms","net"].includes(k));if(k=="hist")hist();if(k=="perf")perf();if(k=="hwd")hws()}
+$("nav").onclick=e=>e.target.dataset.k&&show(e.target.dataset.k);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function preset(){Object.entries({duration:2,pkts:900,bytes_out:40000,bytes_in:2000,uniq_ports:250,syn_ratio:.8,pkt_rate:450,out_in_ratio:20}).forEach(([k,v])=>$("f_"+k).value=v)}
+async function scan(k){let ep,body;if(k=="url"){ep="url";body={url:$("uin").value}}else if(k=="sms"){ep="sms";body={text:$("sin").value}}
+ else{ep="flow";body={flow:Object.fromEntries(F.map(f=>[f,parseFloat($("f_"+f).value)]))}}
+ const r=await fetch("/api/scan/"+ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}),j=await r.json();
+ if(!r.ok){$("out").innerHTML=`<div class="card">${esc(j.error)}</div>`;return}
+ const v=j.verdict,e=j.explanation,c={low:"var(--lo)",medium:"var(--me)",high:"var(--hi)"}[e.risk];
+ $("out").innerHTML=`<div class="card"><span class="badge ${e.risk}">${e.risk.toUpperCase()} RISK</span> <b>${esc(v.label)}</b>
+ <div class="mu">Threat score ${(v.probability*100).toFixed(1)}% · ${j.latency_ms} ms · explainer: ${esc(e.backend)}</div><div class="bar"><i style="width:${v.probability*100}%;background:${c}"></i></div>
+ <p>${esc(e.summary)}</p><b>Evidence</b><ul>${e.evidence.map(x=>`<li>${esc(x)}</li>`).join("")||"<li class='mu'>none</li>"}</ul>
+ <b>Recommended actions</b><ul>${e.recommendations.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;hws()}
+async function hist(){const h=await (await fetch("/api/history")).json();$("ht").innerHTML="<tr><th>Time</th><th>Engine</th><th>Input</th><th>Label</th><th>Risk</th></tr>"+h.map(r=>`<tr><td>${new Date(r.ts*1000).toLocaleTimeString()}</td><td>${r.engine}</td><td>${esc(r.input)}</td><td>${esc(r.label)}</td><td>${r.risk}</td></tr>`).join("")}
+async function perf(){const m=await (await fetch("/api/metrics")).json();let h="";
+ const row=(n,t)=>t?`<tr><td>${n}</td><td>${t.accuracy.toFixed(3)}</td><td>${t.precision.toFixed(3)}</td><td>${t.recall.toFixed(3)}</td><td>${t.f1.toFixed(3)}</td><td>${t.fpr.toFixed(3)}</td><td>${t.fnr.toFixed(3)}</td></tr>`:"";
+ h+="<table><tr><th>Model (test set)</th><th>Acc</th><th>Prec</th><th>Rec</th><th>F1</th><th>FPR</th><th>FNR</th></tr>"+row("URL ("+m.url.selected+")",m.url.test)+row("SMS scam vs legit",m.sms.test_scam_vs_legit)+row("Network iForest",m.net.test_iforest_normal_vs_suspicious)+row("Network RF",m.net.test_rf_normal_vs_suspicious)+"</table>";
+ h+=`<p class="mu">SMS 9-class macro-F1 on unseen templates: ${m.sms.test_macro_f1.toFixed(3)}. ⚠ ${esc(m.url.data_note)}.</p>`;
+ if(m.deployment)h+="<pre class='mu'>"+esc(JSON.stringify(m.deployment,null,1))+"</pre>";else h+="<p class='mu'>Deployment report not generated yet.</p>";$("pf").innerHTML=h}
+async function hws(){const s=await (await fetch("/api/hardware/status")).json();$("hw").textContent=`hardware: ${s.backend} ${s.connected?"connected":"disconnected"} (RTL-verified: ${s.verified_against_rtl})`}
+async function diag(){$("dg").textContent=JSON.stringify(await (await fetch("/api/hardware/diagnostic",{method:"POST"})).json(),null,1);hws()}
+show("url");hws();</script></body></html>
