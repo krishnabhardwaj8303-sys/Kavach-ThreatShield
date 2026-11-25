@@ -4,3 +4,5 @@ scan_history.db
 .env
 *.pem
 *.key
+
+.venv/
